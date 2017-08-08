@@ -57,7 +57,7 @@ namespace DR_Downloader_DEMO
 
             //Initialize downloader
             listBox1.DataSource = TaskList.Instance;
-            ClipBoardMonitor.Instance.NewUrl += url => TaskList.Addtask(url, Destination, UrlValidator.IsValidUrl);
+            ClipBoardMonitor.NewUrl += url => TaskList.Addtask(url, Destination, UrlValidator.IsValidUrl);
         }
 
         #endregion

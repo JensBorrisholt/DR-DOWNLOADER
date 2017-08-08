@@ -13,20 +13,29 @@ namespace Downloader.Helpers
         // ReSharper disable once InconsistentNaming
         public static string FFMPEG_FILENAME => string.Concat(Path.GetTempPath(), "ffmpeg.exe");
 
-        private static void DeleteFfMpeg()
+        private static bool DeleteFfMpeg()
         {
             if (File.Exists(FFMPEG_FILENAME))
-                File.Delete(FFMPEG_FILENAME);
+                try
+                {
+                    File.Delete(FFMPEG_FILENAME);
+                    return true;
+                }
+                catch
+                {
+                    //
+                }
+            return false;
         }
 
         private static void SaveFfMpeg()
         {
-            DeleteFfMpeg();
-            using (var fileStream = new FileStream(FFMPEG_FILENAME, FileMode.Create))
-            {
-                var stream = Assembly.GetCallingAssembly().GetManifestResourceStream("Downloader.ffmpeg.exe");
-                stream?.CopyTo(fileStream);
-            }
+            if (DeleteFfMpeg())
+                using (var fileStream = new FileStream(FFMPEG_FILENAME, FileMode.Create))
+                {
+                    var stream = Assembly.GetCallingAssembly().GetManifestResourceStream("Downloader.ffmpeg.exe");
+                    stream?.CopyTo(fileStream);
+                }
         }
 
         private TaskList() => Task.Run(() => SaveFfMpeg());

@@ -22,7 +22,7 @@ namespace DR_Downloader_DEMO.Helpers
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
-        public event NewUrlHandler NewUrl;
+        public static event NewUrlHandler NewUrl;
 
         public delegate void NewUrlHandler(string url);
 

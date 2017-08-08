@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Downloader.Helpers;
+using Downloader.Helpers.Subtitels;
 using Downloader.JSON_Objects;
 
 
@@ -17,7 +20,7 @@ namespace Downloader
     {
         #region Fields
 
-        private readonly M3U8File streamInformations;
+        private M3U8File StreamInformations { get;  }
 
         #endregion
 
@@ -35,7 +38,7 @@ namespace Downloader
 
         public int ProductionYear { get; }
 
-        public string SubTitle { get; }
+        public Uri SubTitle { get; }
 
         public string Title { get; }
 
@@ -92,10 +95,10 @@ namespace Downloader
 
                 ImageFilename = baseFileName + ".jpg";
                 FileName = baseFileName + ".ts";
+                SubTitleFile = baseFileName + ".srt";
 
                 var m3U8Object = JsonConvert.DeserializeObject<M3u8Object>(webClient.DownloadString(Url));
                 url = m3U8Object.Links?.FirstOrDefault(x => x.Uri.Contains("m3u8"))?.Uri;
-                SubTitle = m3U8Object.SubtitlesList?.FirstOrDefault(x => !string.IsNullOrEmpty(x.Language))?.Language;
 
                 if (url == null)
                     return;
@@ -105,12 +108,15 @@ namespace Downloader
                 if (string.IsNullOrEmpty(tmp))
                     return;
 
-                streamInformations = new M3U8File(tmp);
-                Formats = new List<string>(streamInformations.Streams.GroupBy(s => s.Resolution).Select(s => s.Key));
+                StreamInformations = new M3U8File(tmp);
+                SubTitle = StreamInformations.SubtitlesUri;
+                Formats = new List<string>(StreamInformations.Streams.GroupBy(s => s.Resolution).Select(s => s.Key));
             }
 
             Valid = true;
         }
+
+        public string SubTitleFile { get; }
 
         #endregion
 
@@ -162,8 +168,11 @@ namespace Downloader
                 Directory.CreateDirectory(destination);
             }
 
+
             SaveNfoFile(destination);
-            var streamInformation = streamInformations.InformationFromResolution(resolution);
+            var streamInformation = StreamInformations.InformationFromResolution(resolution);
+            var subtitleTask = Task.Factory.StartNew(() => new SrtGenerator(StreamInformations.SubtitlesUri).SaveToFile(destination + SubTitleFile));
+
             var str = string.Concat(destination, FileName);
             var processStartInfo = new ProcessStartInfo(FFMPEG_FILENAME, $" -i \"{streamInformation.Uri}\" -hide_banner -v quiet -stats -c copy \"{str}\"")
             {
@@ -181,6 +190,7 @@ namespace Downloader
             }
 
             Process.Start(processStartInfo)?.WaitForExit();
+            subtitleTask.Wait();
         }
         #endregion
     }
