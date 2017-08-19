@@ -9,7 +9,14 @@ namespace Downloader.Helpers
     public class TaskList : BindingList<string>
     {
         private static TaskList _instance;
+
+        private TaskList()
+        {
+            Task.Run(() => SaveFfMpeg());
+        }
+
         public static TaskList Instance { get; } = _instance ?? (_instance = new TaskList());
+
         // ReSharper disable once InconsistentNaming
         public static string FFMPEG_FILENAME => string.Concat(Path.GetTempPath(), "ffmpeg.exe");
 
@@ -30,26 +37,29 @@ namespace Downloader.Helpers
 
         private static void SaveFfMpeg()
         {
-            if (DeleteFfMpeg())
-                using (var fileStream = new FileStream(FFMPEG_FILENAME, FileMode.Create))
-                {
-                    var stream = Assembly.GetCallingAssembly().GetManifestResourceStream("Downloader.ffmpeg.exe");
-                    stream?.CopyTo(fileStream);
-                }
+            if (!DeleteFfMpeg())
+                return;
+
+            using (var fileStream = new FileStream(FFMPEG_FILENAME, FileMode.Create))
+            {
+                var stream = Assembly.GetCallingAssembly().GetManifestResourceStream("Downloader.ffmpeg.exe");
+                stream?.CopyTo(fileStream);
+            }
         }
 
-        private TaskList() => Task.Run(() => SaveFfMpeg());
-
-        ~TaskList() => DeleteFfMpeg();
+        ~TaskList()
+        {
+            DeleteFfMpeg();
+        }
 
         private void DoAddtask(string url, string destinationDirectory)
         {
-            if (!UrlValidator.IsValidUrl(url) || Contains(url))
+            if (Contains(url))
                 return;
 
             Add(url);
             var ctx = TaskScheduler.FromCurrentSynchronizationContext();
-            Task.Factory.StartNew(() => { new MovieInformation(url).Save(destinationDirectory); })
+            Task.Factory.StartNew(() => new MovieInformation(url).Save(destinationDirectory))
                 .ContinueWith(_ => Remove(url), ctx);
         }
 
@@ -58,6 +68,5 @@ namespace Downloader.Helpers
             if (validate(url))
                 Instance.DoAddtask(url, destinationDirectory);
         }
-
     }
 }

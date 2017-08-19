@@ -9,6 +9,9 @@ namespace Downloader.Helpers
 
         public static List<string> Parse(string line)
         {
+            if (string.IsNullOrEmpty(line))
+                return new List<string>();
+
             const char escapeChar = '"';
             const char splitChar = ',';
             var inEscape = false;
@@ -24,7 +27,9 @@ namespace Downloader.Helpers
                 {
                     case escapeChar:
                         if (!inEscape)
+                        {
                             inEscape = true;
+                        }
                         else
                         {
                             if (!priorEscape)
@@ -43,7 +48,9 @@ namespace Downloader.Helpers
                         break;
                     case splitChar:
                         if (inEscape) //if in escape
+                        {
                             sb.Append(c);
+                        }
                         else
                         {
                             result.Add(sb.ToString());

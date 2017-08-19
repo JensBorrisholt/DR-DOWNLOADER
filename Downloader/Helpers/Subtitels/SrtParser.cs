@@ -7,20 +7,20 @@ namespace Downloader.Helpers.Subtitels
 {
     public class SrtParser
     {
-        private readonly string[] delimiters = { "-->", "- >", "->" };
+        private readonly string[] delimiters = {"-->", "- >", "->"};
 
         public List<SubtitleItem> Parse(string rawString)
         {
             var result = new List<SubtitleItem>();
-            var strSubParts = rawString.Split(new[] { "\r\n\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            var strSubParts = rawString.Split(new[] {"\r\n\r\n"}, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var srtSubPart in strSubParts)
             {
-                var lines = srtSubPart.Split(new[] { Environment.NewLine }, StringSplitOptions.None).Select(s => s.Trim()).Where(l => !string.IsNullOrEmpty(l));
+                var lines = srtSubPart.Split(new[] {Environment.NewLine}, StringSplitOptions.None).Select(s => s.Trim())
+                    .Where(l => !string.IsNullOrEmpty(l));
 
                 var item = new SubtitleItem();
                 foreach (var line in lines)
-                {
                     if (item.StartTime == 0 && item.EndTime == 0)
                     {
                         if (TryParseTimecodeLine(line, out int startTc, out int endTc))
@@ -30,8 +30,9 @@ namespace Downloader.Helpers.Subtitels
                         }
                     }
                     else
+                    {
                         item.Lines.Add(line);
-                }
+                    }
 
                 if (item.IsValid())
                     result.Add(item);
@@ -62,7 +63,7 @@ namespace Downloader.Helpers.Subtitels
                 return -1;
 
             if (TimeSpan.TryParse(match.Value.Replace(',', '.'), out var result))
-                return (int)result.TotalMilliseconds;
+                return (int) result.TotalMilliseconds;
 
             return -1;
         }

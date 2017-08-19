@@ -57,7 +57,7 @@
     <Compile Include="Helpers\URLValidator.cs" />
     <Compile Include="JSON Objects\BroadcastInformation.cs" />
     <Compile Include="Helpers\CsvParser.cs" />
-    <Compile Include="Helpers\StreamInformation.cs" />
+    <Compile Include="StreamInformation.cs" />
     <Compile Include="JSON Objects\M3U8Link.cs" />
     <Compile Include="Helpers\M3U8File.cs" />
     <Compile Include="MovieInformation.cs" />

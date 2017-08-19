@@ -8,10 +8,25 @@ namespace DR_Downloader_DEMO.Helpers
 {
     public sealed class ClipBoardMonitor : NativeWindow
     {
+        public delegate void NewUrlHandler(string url);
+
         // ReSharper disable InconsistentNaming
         private const int WM_DESTROY = 0x2;
+
         private const int WM_DRAWCLIPBOARD = 0x308;
         private const int WM_CHANGECBCHAIN = 0x30d;
+
+        private static ClipBoardMonitor instance;
+
+        private IntPtr NextClipBoardViewerHandle;
+
+        private ClipBoardMonitor()
+        {
+            CreateHandle(new CreateParams());
+            NextClipBoardViewerHandle = SetClipboardViewer(Handle);
+        }
+
+        public static ClipBoardMonitor Instance { get; } = instance ?? (instance = new ClipBoardMonitor());
 
         [DllImport("user32.dll")]
         private static extern IntPtr SetClipboardViewer(IntPtr hWndNewViewer);
@@ -23,19 +38,6 @@ namespace DR_Downloader_DEMO.Helpers
         private static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
         public static event NewUrlHandler NewUrl;
-
-        public delegate void NewUrlHandler(string url);
-
-        private IntPtr NextClipBoardViewerHandle;
-
-        private ClipBoardMonitor()
-        {
-            CreateHandle(new CreateParams());
-            NextClipBoardViewerHandle = SetClipboardViewer(Handle);
-        }
-
-        private static ClipBoardMonitor instance;
-        public static ClipBoardMonitor Instance { get; } = instance ?? (instance = new ClipBoardMonitor());
 
         protected override void WndProc(ref Message m)
         {

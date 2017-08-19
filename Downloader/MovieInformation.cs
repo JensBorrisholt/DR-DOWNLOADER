@@ -6,13 +6,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Downloader.Helpers;
-using Downloader.Helpers.Subtitels;
 using Downloader.JSON_Objects;
-
-
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using static Downloader.Helpers.TaskList;
+
 // ReSharper disable RedundantStringInterpolation
 namespace Downloader
 {
@@ -20,7 +18,50 @@ namespace Downloader
     {
         #region Fields
 
-        private M3U8File StreamInformations { get;  }
+        private M3U8File StreamInformations { get; }
+
+        #endregion
+
+        #region Interface Implementations
+
+        public void Save(string resolution, string destination, bool createDirectory)
+        {
+            if (!destination.EndsWith("\\"))
+                destination += "\\";
+
+            if (createDirectory)
+            {
+                destination = string.Concat(destination, RemoveInvalidChars(Title), "\\");
+                Directory.CreateDirectory(destination);
+            }
+
+
+            SaveNfoFile(destination);
+            var streamInformation = StreamInformations.InformationFromResolution(resolution);
+            var subtitleTask =
+                Task.Factory.StartNew(
+                    () => new SrtGenerator(StreamInformations.SubtitlesUri).SaveToFile(destination + SubTitleFile));
+
+            var str = string.Concat(destination, FileName);
+            var processStartInfo = new ProcessStartInfo(FFMPEG_FILENAME,
+                $" -i \"{streamInformation.Uri}\" -hide_banner -v quiet -stats -c copy \"{str}\"")
+            {
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+
+            str = string.Concat(destination, ImageFilename);
+
+            File.Delete(str);
+
+            using (var fileStream = new FileStream(str, FileMode.CreateNew))
+            {
+                TitleImage.WriteTo(fileStream);
+                fileStream.Close();
+            }
+
+            Process.Start(processStartInfo)?.WaitForExit();
+            subtitleTask.Wait();
+        }
 
         #endregion
 
@@ -51,6 +92,7 @@ namespace Downloader
         #endregion
 
         #region Constructors
+
         public MovieInformation(string url)
         {
             Valid = false;
@@ -62,9 +104,11 @@ namespace Downloader
             var broadcastInformation =
             (
                 from script in htmlDocument.DocumentNode.Descendants("script")
-                select script.InnerText into s
+                select script.InnerText
+                into s
                 where s.Contains("window.DR")
-                select s.Replace("window.DR = {", "{").Replace("};", "}") into json
+                select s.Replace("window.DR = {", "{").Replace("};", "}")
+                into json
                 select JsonConvert.DeserializeObject<BroadcastInformation>(json)
             ).FirstOrDefault();
 
@@ -122,82 +166,40 @@ namespace Downloader
 
         #region Members
 
-        private static string RemoveInvalidChars(string userInput) => Path.GetInvalidFileNameChars().Aggregate(userInput, (current, nameChar) => current.Replace(nameChar, ' '));
+        private static string RemoveInvalidChars(string userInput)
+        {
+            return Path.GetInvalidFileNameChars()
+                .Aggregate(userInput, (current, nameChar) => current.Replace(nameChar, ' '));
+        }
 
         public void Save(string destination)
         {
             if (Valid)
-                Save(Formats.Last(), destination, false);
+                Save(Formats.Last(), destination, true);
         }
 
         private void SaveNfoFile(string destination)
         {
-
             var strs = new List<string>
-                       {
-                           $"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>",
-                           $"<movie>",
-                           $"    <title>{Title}</title>",
-                           $"    <originaltitle>{Title}</originaltitle>",
-                           $"    <year>{ProductionYear}</year>",
-                           $"    <outline>{SubTitle}</outline>",
-                           $"    <plot>{Description}</plot>",
-                           $"    <thumb aspect=\"poster\" preview=\"{ImageFilename}\">{ImageFilename}</thumb>",
-                           $"  <fanart>",
-                           $"    <thumb preview=\"{ImageFilename}\">{ImageFilename}</thumb>",
-                           $"  </fanart>",
-                           $"</movie>"
-                       };
+            {
+                $"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>",
+                $"<movie>",
+                $"    <title>{Title}</title>",
+                $"    <originaltitle>{Title}</originaltitle>",
+                $"    <year>{ProductionYear}</year>",
+                $"    <outline>{SubTitle}</outline>",
+                $"    <plot>{Description}</plot>",
+                $"    <thumb aspect=\"poster\" preview=\"{ImageFilename}\">{ImageFilename}</thumb>",
+                $"  <fanart>",
+                $"    <thumb preview=\"{ImageFilename}\">{ImageFilename}</thumb>",
+                $"  </fanart>",
+                $"</movie>"
+            };
 
             destination = string.Concat(destination, RemoveInvalidChars(Title), ".nfo");
             File.WriteAllLines(destination, strs);
         }
 
         #endregion
-
-        #region Interface Implementations
-
-        public void Save(string resolution, string destination, bool createDirectory)
-        {
-            if (!destination.EndsWith("\\"))
-                destination += "\\";
-
-            if (createDirectory)
-            {
-                destination = string.Concat(destination, RemoveInvalidChars(Title), "\\");
-                Directory.CreateDirectory(destination);
-            }
-
-
-            SaveNfoFile(destination);
-            var streamInformation = StreamInformations.InformationFromResolution(resolution);
-            var subtitleTask = Task.Factory.StartNew(() => new SrtGenerator(StreamInformations.SubtitlesUri).SaveToFile(destination + SubTitleFile));
-
-            var str = string.Concat(destination, FileName);
-            var processStartInfo = new ProcessStartInfo(FFMPEG_FILENAME, $" -i \"{streamInformation.Uri}\" -hide_banner -v quiet -stats -c copy \"{str}\"")
-            {
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
-
-            str = string.Concat(destination, ImageFilename);
-
-            File.Delete(str);
-
-            using (var fileStream = new FileStream(str, FileMode.CreateNew))
-            {
-                TitleImage.WriteTo(fileStream);
-                fileStream.Close();
-            }
-
-            Process.Start(processStartInfo)?.WaitForExit();
-            subtitleTask.Wait();
-        }
-        #endregion
     }
 }
-
-
-
-
-
-

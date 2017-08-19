@@ -2,25 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Downloader.Helpers;
 
-namespace Downloader.Helpers
+namespace Downloader
 {
     internal class StreamInformation : IEquatable<StreamInformation>, IComparable<StreamInformation>
     {
         #region Fields
 
         private static readonly Regex ResolutionExpr = new Regex(@"\d{3,4}", RegexOptions.Compiled);
-
-        #endregion
-
-        #region Properties
-
-        public int BandWidth { get; private set; }
-        public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>();
-        public string RawDescription { get; }
-
-        public string Resolution { get; private set; }
-        public string Uri { get; }
 
         #endregion
 
@@ -35,6 +25,17 @@ namespace Downloader.Helpers
 
         #endregion
 
+        #region Properties
+
+        public int BandWidth { get; private set; }
+        public Dictionary<string, string> Properties { get; } = new Dictionary<string, string>();
+        public string RawDescription { get; }
+
+        public string Resolution { get; private set; }
+        public string Uri { get; }
+
+        #endregion
+
         #region Members
 
         private void Parse()
@@ -46,7 +47,10 @@ namespace Downloader.Helpers
             BandWidth = int.TryParse(PropertyByName("BANDWIDTH"), out int dummy) ? dummy : 0;
         }
 
-        public string PropertyByName(string name) => Properties.FirstOrDefault(e => e.Key == name).Value;
+        public string PropertyByName(string name)
+        {
+            return Properties.FirstOrDefault(e => e.Key == name).Value;
+        }
 
         #endregion
 
@@ -63,7 +67,10 @@ namespace Downloader.Helpers
             return result;
         }
 
-        public bool Equals(StreamInformation other) => other?.Resolution == Resolution;
+        public bool Equals(StreamInformation other)
+        {
+            return other?.Resolution == Resolution;
+        }
 
         #endregion
     }

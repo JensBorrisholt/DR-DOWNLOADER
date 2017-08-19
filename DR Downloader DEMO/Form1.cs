@@ -9,6 +9,20 @@ namespace DR_Downloader_DEMO
 {
     public partial class Form1 : Form
     {
+        #region Constructors
+
+        public Form1()
+        {
+            InitializeComponent();
+            textBoxDirectory.Text = Destination;
+
+            //Initialize downloader
+            listBox1.DataSource = TaskList.Instance;
+            ClipBoardMonitor.NewUrl += url => TaskList.Addtask(url, Destination, UrlValidator.IsValidUrl);
+        }
+
+        #endregion
+
         #region Fields
 
         private const string KeyName = "Destination";
@@ -44,20 +58,6 @@ namespace DR_Downloader_DEMO
                 Registry.CurrentUser.CreateSubKey(SubKey);
                 return Registry.CurrentUser.OpenSubKey(SubKey, true);
             }
-        }
-
-        #endregion
-
-        #region Constructors
-
-        public Form1()
-        {
-            InitializeComponent();
-            textBoxDirectory.Text = Destination;
-
-            //Initialize downloader
-            listBox1.DataSource = TaskList.Instance;
-            ClipBoardMonitor.NewUrl += url => TaskList.Addtask(url, Destination, UrlValidator.IsValidUrl);
         }
 
         #endregion
