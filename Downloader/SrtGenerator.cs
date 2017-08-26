@@ -33,6 +33,8 @@ namespace Downloader
 
             using (var webClient = new WebClient {Encoding = Encoding.UTF8})
             {
+
+
                 return webClient.DownloadString(uri);
             }
         }
@@ -65,9 +67,8 @@ namespace Downloader
             }
 
             var count = 0;
-            if (Items?.Any() == true)
-                File.WriteAllLines(fileName,
-                    Items.OrderBy(e => e?.StartTime).Select(element => ++count + Environment.NewLine + element));
+            if (Items.Any())
+                File.WriteAllLines(fileName, Items.OrderBy(e => e?.StartTime).Select(element => ++count + Environment.NewLine + element));
         }
     }
 }

@@ -26,13 +26,13 @@ namespace Downloader.Helpers
                 try
                 {
                     File.Delete(FFMPEG_FILENAME);
-                    return true;
                 }
                 catch
                 {
-                    //
+                    return false;
                 }
-            return false;
+
+            return true;
         }
 
         private static void SaveFfMpeg()

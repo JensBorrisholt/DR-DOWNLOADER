@@ -39,14 +39,14 @@ namespace Downloader
             SaveNfoFile(destination);
             var streamInformation = StreamInformations.InformationFromResolution(resolution);
             var subtitleTask =
-                Task.Factory.StartNew(
-                    () => new SrtGenerator(StreamInformations.SubtitlesUri).SaveToFile(destination + SubTitleFile));
+                Task.Factory.StartNew(() => new SrtGenerator(StreamInformations.SubtitlesUri).SaveToFile(destination + SubTitleFile));
 
             var str = string.Concat(destination, FileName);
             var processStartInfo = new ProcessStartInfo(FFMPEG_FILENAME,
                 $" -i \"{streamInformation.Uri}\" -hide_banner -v quiet -stats -c copy \"{str}\"")
             {
-                WindowStyle = ProcessWindowStyle.Hidden
+                WindowStyle = ProcessWindowStyle.Hidden,
+                UseShellExecute = true
             };
 
             str = string.Concat(destination, ImageFilename);

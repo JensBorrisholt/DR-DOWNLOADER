@@ -17,17 +17,14 @@ namespace Downloader.Helpers
 
             var subs =
                 rawData
-                    .Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
                     .FirstOrDefault(e => e.StartsWith("#EXT-X-MEDIA:TYPE=SUBTITLES"));
 
             if (!string.IsNullOrEmpty(subs))
-                SubtitlesUri = new Uri(CsvParser.Parse(subs).FirstOrDefault(e => e.StartsWith("URI="))?.Substring(4) ??
-                                       "");
-
-
+                SubtitlesUri = new Uri(CsvParser.Parse(subs).FirstOrDefault(e => e.StartsWith("URI="))?.Substring(4) ??  "");
 
             var lines =
-                rawData.Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
+                rawData.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
                     .Where(e => e.StartsWith("#EXT-X-STREAM-INF") || e.StartsWith("http"))
                     .ToList();
 
