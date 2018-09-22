@@ -97,7 +97,6 @@ namespace DR_Downloader_DEMO
         TextBox textBoxDirectory;
         Label label5;
         ListBox listBox1;
-
     }
 }
 

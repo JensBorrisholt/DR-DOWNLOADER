@@ -9,7 +9,6 @@ namespace Downloader.Helpers
     public class TaskList : BindingList<string>
     {
         private static TaskList _instance;
-
         private TaskList()
         {
             Task.Run(() => SaveFfMpeg());

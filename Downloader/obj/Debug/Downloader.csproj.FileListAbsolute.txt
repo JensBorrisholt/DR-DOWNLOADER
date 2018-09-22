@@ -9,3 +9,16 @@ C:\Users\Jens Borrisholt\Source\Workspaces\Borrisholt Test\DR Downloader\Downloa
 C:\Users\Jens Borrisholt\Source\Workspaces\Borrisholt Test\DR Downloader\Downloader\obj\Debug\Downloader.dll
 C:\Users\Jens Borrisholt\Source\Workspaces\Borrisholt Test\DR Downloader\Downloader\obj\Debug\Downloader.pdb
 C:\Users\Jens Borrisholt\Source\Workspaces\Borrisholt Test\DR Downloader\Downloader\obj\Debug\Downloader.csprojResolveAssemblyReference.cache
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\ffmpeg.exe
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\Downloader.dll
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\Downloader.pdb
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\HtmlAgilityPack.dll
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\HtmlAgilityPack.xml
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\obj\Debug\Downloader.csprojResolveAssemblyReference.cache
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\obj\Debug\Downloader.csproj.CoreCompileInputs.cache
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\obj\Debug\Downloader.dll
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\obj\Debug\Downloader.pdb
+C:\Users\Jens\Source\Repos\DR-DOWNLOADER\Downloader\obj\Debug\Downloader.csproj.CopyComplete

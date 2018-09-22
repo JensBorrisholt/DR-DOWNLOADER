@@ -101,18 +101,26 @@ namespace Downloader
                 return;
 
             var htmlDocument = new HtmlWeb().Load(url);
-            var broadcastInformation =
-            (
-                from script in htmlDocument.DocumentNode.Descendants("script")
+
+            var json = (from script in htmlDocument.DocumentNode.Descendants("script")
                 select script.InnerText
                 into s
                 where s.Contains("window.DR")
-                select s.Replace("window.DR = {", "{").Replace("};", "}")
-                into json
-                select JsonConvert.DeserializeObject<BroadcastInformation>(json)
-            ).FirstOrDefault();
+                select s.Replace("window.DR = {", "{").Replace("};", "}")).FirstOrDefault();
 
-            var programCard = broadcastInformation?.Tv.ProgramCard;
+            json = json?.Replace(@"\\.\pipe\", "");
+            var broadcastInformation = JsonConvert.DeserializeObject<BroadcastInformation>(json);
+            //(
+            //    from script in htmlDocument.DocumentNode.Descendants("script")
+            //    select script.InnerText
+            //    into s
+            //    where s.Contains("window.DR")
+            //    select s.Replace("window.DR = {", "{").Replace("};", "}")
+            //    into json
+            //    select JsonConvert.DeserializeObject<BroadcastInformation>(json.Replace(@"\\\\.\\pipe\\", ""))
+            //).FirstOrDefault();
+
+            var programCard = broadcastInformation?.TV.ProgramCard;
 
             if (programCard == null)
                 return;

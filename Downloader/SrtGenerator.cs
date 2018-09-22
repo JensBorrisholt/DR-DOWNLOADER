@@ -49,8 +49,8 @@ namespace Downloader
             }
 
             var urls = RawString.Split(new[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries)
-                .Where(e => e.StartsWith("http://www.dr.dk/mu-online/"));
-
+                .Where(e => e.StartsWith("http://www.dr.dk/mu-online/") || e.StartsWith("https://www.dr.dk/mu-online/") );
+            
             foreach (var line in urls)
                 tasks.Add(Task.Factory.StartNew(Action, line)
                     .ContinueWith(elements => Items.AddRange(elements.Result.ToList())));
